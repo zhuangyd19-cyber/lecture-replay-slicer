@@ -27,7 +27,7 @@ WIN = 30.0  # 转写窗口秒数，勿调大（漂移根因）
 HALLUC = [
     "优优独播", "yoyo television", "请不吝点赞", "打赏支持", "明镜与点点",
     "字幕志愿者", "感谢大家收看", "感谢观看", "请订阅", "点点关注",
-    "中文字幕志愿者", "bilibili", "点赞订阅",
+    "中文字幕志愿者",
 ]
 PUNCT = {",": "，", ".": "。", "?": "？", "!": "！", ";": "；", ":": "："}
 
@@ -42,7 +42,8 @@ def is_junk(t):
     if not t:
         return True
     low = t.lower()
-    if any(h in low or h in t for h in HALLUC):
+    # 幻觉签名只在整句较短时过滤，避免误伤正常讲课中提及这些词的长句
+    if len(norm_text(t)) <= 40 and any(h in low or h in t for h in HALLUC):
         return True
     n = norm_text(t)
     if len(n) < 2:
@@ -76,21 +77,26 @@ def fmt_ts(sec):
     return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
 
 
-SRT_RE = re.compile(r"(\d\d):(\d\d):(\d\d),(\d\d\d) --> (\d\d):(\d\d):(\d\d),(\d\d\d)")
+SRT_RE = re.compile(r"(\d\d):(\d\d):(\d\d),(\d\d\d)\s*-->\s*(\d\d):(\d\d):(\d\d),(\d\d\d)")
 
 
 def load_srt(path):
+    """按块解析：时间行定位起点，其余行全部保留为正文（不再把纯数字行当序号丢掉）。"""
     cues = []
     if not os.path.exists(path):
         return cues
     txt = open(path, encoding="utf-8").read()
-    for b in re.split(r"\n\s*\n", txt.strip()):
-        m = SRT_RE.search(b)
-        if not m:
+    for bi, b in enumerate(re.split(r"\n\s*\n", txt.strip()), 1):
+        lines = b.split("\n")
+        ti = next((i for i, l in enumerate(lines) if SRT_RE.search(l)), None)
+        if ti is None:
+            print(f"警告：第 {bi} 块无时间行，已跳过并保留检查：{b[:40]!r}", file=sys.stderr)
             continue
+        m = SRT_RE.search(lines[ti])
         st = int(m[1]) * 3600 + int(m[2]) * 60 + int(m[3]) + int(m[4]) / 1000
         en = int(m[5]) * 3600 + int(m[6]) * 60 + int(m[7]) + int(m[8]) / 1000
-        body = "\n".join(l for l in b.split("\n") if "-->" not in l and not l.strip().isdigit()).strip()
+        # 时间行之前可能有序号行；时间行之后的所有行都是正文
+        body = "\n".join(lines[ti + 1:]).strip()
         if body:
             cues.append([st, en, body])
     return cues
@@ -98,14 +104,18 @@ def load_srt(path):
 
 def save_srt(path, cues):
     cues.sort(key=lambda c: c[0])
-    with open(path, "w", encoding="utf-8") as f:
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         for i, (st, en, body) in enumerate(cues, 1):
             f.write(f"{i}\n{fmt_ts(st)} --> {fmt_ts(en)}\n{body}\n\n")
+    os.replace(tmp, path)  # 原子写回，写一半中断不会毁文件
 
 
 def duration(path):
     r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
                         "-of", "csv=p=0", path], capture_output=True, text=True)
+    if r.returncode != 0 or not r.stdout.strip():
+        raise RuntimeError(f"ffprobe 无法读取时长：{path}\n{r.stderr.strip()}")
     return float(r.stdout.strip())
 
 
@@ -140,10 +150,11 @@ def asr_window(wav, lang="zh"):
 
 
 def transcribe_range(video, t0, t1, lang="zh"):
-    """按 30 秒小窗转写 [t0, t1]，返回绝对时间字幕条。"""
+    """按 30 秒小窗转写 [t0, t1]，返回绝对时间字幕条（每条都限制在自己窗口内，防止跨窗重叠）。"""
+    import math
     cues = []
     w = t0
-    total = max(1, int((t1 - t0) / WIN) + 1)
+    total = max(1, math.ceil((t1 - t0) / WIN))
     done = 0
     while w < t1:
         ln = min(WIN, t1 - w)
@@ -155,10 +166,11 @@ def transcribe_range(video, t0, t1, lang="zh"):
                 text = to_fullwidth(text.strip())
                 if is_junk(text):
                     continue
-                a, b = w + st, w + en
-                if a >= t1 or b <= t0:
+                a = max(w + st, w, t0)       # 不越窗左界
+                b = min(w + en, w + ln, t1)  # 不越窗右界
+                if b <= a:
                     continue
-                cues.append([a, min(b, t1), text])
+                cues.append([a, b, text])
         finally:
             os.unlink(wav)
         w += WIN
@@ -181,18 +193,32 @@ def main():
 
     srt = args.output or os.path.splitext(args.video)[0] + ".srt"
     d = duration(args.video)
-    t0, t1 = args.start, (args.end if args.end is not None else d)
+    t1 = args.end if args.end is not None else d
 
+    # 参数合法性：必须在视频范围内且起点<终点；两种模式不得混用
     if args.replace_range:
+        if args.start != 0 or args.end is not None:
+            ap.error("--replace-range 不能和 --start/--end 同时使用")
         r0, r1 = args.replace_range
+        if not (0 <= r0 < r1 <= d):
+            ap.error(f"--replace-range 区间非法：[{r0}, {r1}]，视频时长 {d:.0f}s")
         old = load_srt(srt)
+        if not old:
+            ap.error(f"{srt} 不存在或没有可替换的字幕；全片转写请不要用 --replace-range")
         kept = [c for c in old if not (c[0] < r1 and c[1] > r0)]
         print(f"删除 [{r0}-{r1}] 内 {len(old) - len(kept)} 条", flush=True)
         new = transcribe_range(args.video, r0, r1, args.lang)
+        if not new:
+            print("警告：该区间未识别到任何有效语音，为避免误删，已保留原文件不动。", file=sys.stderr)
+            sys.exit(3)
+        import shutil
+        shutil.copy2(srt, srt + ".bak")  # 修复前自动备份
         save_srt(srt, kept + new)
-        print(f"修复完成：{len(old)} -> {len(load_srt(srt))} 条（新增 {len(new)}）→ {srt}", flush=True)
+        print(f"修复完成：{len(old)} -> {len(load_srt(srt))} 条（新增 {len(new)}，备份 {srt}.bak）→ {srt}", flush=True)
     else:
-        cues = transcribe_range(args.video, t0, t1, args.lang)
+        if not (0 <= args.start < t1 <= d):
+            ap.error(f"区间非法：[{args.start}, {t1}]，视频时长 {d:.0f}s")
+        cues = transcribe_range(args.video, args.start, t1, args.lang)
         save_srt(srt, cues)
         print(f"完成 {len(cues)} 条 → {srt}", flush=True)
 

@@ -29,7 +29,7 @@ description: 把直播回放/课程录像/会议长视频自动拆解成按讲�
 ### 1. 获取视频
 
 - 本地文件：直接用。
-- 链接：先 `scripts/download_video.py <URL>`；不支持的平台（如小鹅通）按其提示抓 m3u8 后 `--m3u8` 下载。登录态让用户自己在浏览器完成。
+- 链接：先 `python3 scripts/download_video.py <URL>`；不支持的平台（如小鹅通）按其提示抓 m3u8 后 `--m3u8` 下载。登录态让用户自己在浏览器完成。
 - 只处理用户已获授权观看的内容。
 
 ### 2. 解析日程 → 边界表
@@ -47,7 +47,7 @@ name,start,end
 ### 3. 转写
 
 ```bash
-python scripts/transcribe_srt.py 视频.mp4          # 全片
+python3 scripts/transcribe_srt.py 视频.mp4          # 全片
 ```
 
 30 秒小窗是防漂移的关键，勿改大。长视频放后台跑。
@@ -55,16 +55,16 @@ python scripts/transcribe_srt.py 视频.mp4          # 全片
 ### 4. 对齐校验（不可省略）
 
 ```bash
-python scripts/align_check.py 视频.mp4             # 每 300s 采样
+python3 scripts/align_check.py 视频.mp4             # 每 300s 采样
 ```
 
-- ⚠️ 点先分诊：无人声段的幻觉签名属正常；真语音且匹配 <0.35 或偏移 >25s → 记录区间。
+- ⚠️ 点先分诊：无人声段的幻觉签名属正常；真语音且匹配 <0.40 或偏移 >25s → 记录区间。
 - 对问题区间用 `--replace-range S E` 定点修复（只动问题段，验证好的部分不要重转），修完重跑校验确认。
 
 ### 5. 切片封装
 
 ```bash
-python scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
+python3 scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
 ```
 
 流复制无损秒切；每段产出内嵌 mov_text 字幕轨的 mp4 + 时间平移后的同名 srt。

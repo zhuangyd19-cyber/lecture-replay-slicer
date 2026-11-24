@@ -1,5 +1,7 @@
 # 录像切片师（lecture-replay-slicer）
 
+**[English README → README_EN.md](README_EN.md)**
+
 「庄生解牛」系列 · 庄源东（zhuangyd19-cyber）作品
 
 ![海报](assets/poster.png)

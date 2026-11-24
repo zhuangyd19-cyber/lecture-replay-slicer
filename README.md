@@ -1,4 +1,6 @@
-# 庄生晓梦 · 回放切片师（lecture-replay-slicer）
+# 回放切片师（lecture-replay-slicer）
+
+「庄生晓梦」系列 · 庄源东（zhuangyd19-cyber）作品
 
 ![海报](assets/poster.png)
 

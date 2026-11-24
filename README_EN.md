@@ -42,7 +42,21 @@ Long-video transcription has invisible landmines; this skill turns every lesson 
 
 Before touching any video, run `scripts/detect_env.py`: it probes the OS / chip / RAM / GPU and automatically picks the right ASR engine and model size — from Apple Silicon full-power (`mlx-whisper large-v3`) down to a CPU-only `base int8` fallback. Decision table in `references/model-selection.md`. Same skill, optimal on every machine.
 
-## Install
+## Install — one sentence, zero clicks
+
+No manual download needed. Just tell your AI agent (Kimi / Codex / Claude / Workbuddy):
+
+> **Install this skill for me: https://github.com/zhuangyd19-cyber/lecture-replay-slicer**
+
+The agent clones the repo into its skills directory and verifies it — done. Then say "庄生解牛" and it starts working.
+
+<details>
+<summary>Prefer manual install?</summary>
+
+Download `lecture-replay-slicer.skill` from [Releases](https://github.com/zhuangyd19-cyber/lecture-replay-slicer/releases), or clone this repo into your agent's skills directory: `~/.codex/skills/`, `~/.claude/skills/`, `~/.workbuddy/skills/`, or Kimi's managed skills directory.
+</details>
+
+## Install (legacy notes)
 
 1. Download `lecture-replay-slicer.skill` from [Releases](https://github.com/zhuangyd19-cyber/lecture-replay-slicer/releases), or copy this repo into your agent's skills directory:
    - Kimi: the managed skills directory

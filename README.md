@@ -50,7 +50,22 @@ ppt/        从视频画面还原的可编辑 PPT
   6. 文档交付物    make_seg_docs.py → 逐字稿 Word / 总结 / 脑图 / PPT
 ```
 
-## 安装
+## 安装（口令一键安装）
+
+不用手动下载！直接对你的 AI 助手说一句（Kimi / Codex / Claude / Workbuddy 均可）：
+
+> **帮我安装这个技能并立即生效：https://github.com/zhuangyd19-cyber/lecture-replay-slicer**
+
+助手会自动完成：从 GitHub 拉取仓库 → 放入本机技能目录 → 验证可用。装完对它说一声「庄生解牛」就能开工。
+
+<details>
+<summary>喜欢手动安装？点这里</summary>
+
+1. 在 [Releases](https://github.com/zhuangyd19-cyber/lecture-replay-slicer/releases) 下载 `lecture-replay-slicer.skill`；或 `git clone https://github.com/zhuangyd19-cyber/lecture-replay-slicer.git`
+2. 放入技能目录：Kimi 托管技能目录 / `~/.codex/skills/` / `~/.claude/skills/` / `~/.workbuddy/skills/`
+</details>
+
+## 安装（旧版说明）
 
 把本目录放入任一平台的技能目录即可，同一份 SKILL.md 全平台通用：
 

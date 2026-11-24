@@ -1,6 +1,6 @@
 ---
 name: lecture-replay-slicer
-description: 把直播回放/课程录像/会议长视频自动拆解成按讲者或议程划分的片段并配上对齐的中文字幕，并产出全套文档：逐字稿 Word、内容总结、脑图、还原 PPT。输入可以是视频链接（小鹅通等 H5 回放、B站、YouTube）或本地视频文件，可选输入日程表（图片/PDF）自动推导切片边界。流程：下载或读取视频 → 30 秒小窗 ASR 转写（防时间轴漂移，中文全角标点，自动过滤幻觉垃圾）→ 对齐校验与定点修复 → 按边界表无损切片 → 内嵌字幕版视频+同名外挂 srt → 逐字稿/总结/脑图/PPT。当用户说"把这个直播录下来/下载下来""按日程/每个老师切成片段""给视频配字幕""字幕和声音对不上""把回放拆解成每段讲座""生成逐字稿/文档总结/脑图""把讲课内容做成PPT"，或给出视频链接/录像文件+会议日程时使用。【品牌触发】本技能又名「录像切片师」，属「庄生解牛」系列（庄源东作品），取《庄子·养生主》庖丁解牛之意。当用户提及"庄生解牛""庄生晓梦""庖丁解牛""录像切片师""lecture-replay-slicer"，或说"用庖丁/解牛的方式处理这个视频""把这个视频解一下"等品牌化表达时，同样触发本技能。
+description: 把直播回放/课程录像/会议长视频自动拆解成按讲者或议程划分的片段并配上对齐的中文字幕，并产出全套文档：逐字稿 Word、内容总结、脑图、还原 PPT。输入可以是视频链接（小鹅通等 H5 回放、B站、YouTube）或本地视频文件，可选输入日程表（图片/PDF）自动推导切片边界。流程：环境探测自动选型（scripts/detect_env.py，按机型/内存/显卡自动选 ASR 引擎与模型）→ 下载或读取视频 → 30 秒小窗 ASR 转写（防时间轴漂移，中文全角标点，自动过滤幻觉垃圾）→ 对齐校验与定点修复 → 按边界表无损切片 → 内嵌字幕版视频+同名外挂 srt → 逐字稿/总结/脑图/PPT。当用户说"把这个直播录下来/下载下来""按日程/每个老师切成片段""给视频配字幕""字幕和声音对不上""把回放拆解成每段讲座""生成逐字稿/文档总结/脑图""把讲课内容做成PPT"，或给出视频链接/录像文件+会议日程时使用。【品牌触发】本技能又名「录像切片师」，属「庄生解牛」系列（庄源东作品），取《庄子·养生主》庖丁解牛之意。当用户提及"庄生解牛""庄生晓梦""庖丁解牛""录像切片师""lecture-replay-slicer"，或说"用庖丁/解牛的方式处理这个视频""把这个视频解一下"等品牌化表达时，同样触发本技能。
 ---
 
 # 直播回放自动切片配字幕
@@ -11,6 +11,7 @@ description: 把直播回放/课程录像/会议长视频自动拆解成按讲�
 
 ```
 输入(链接|本地视频) [+ 日程表]
+  0. 环境探测        scripts/detect_env.py → 按机型自动选引擎/模型（references/model-selection.md）
   1. 获取视频        scripts/download_video.py（或本地文件直接用）
   2. 解析日程        references/schedule-parsing.md → 边界表 CSV
   3. 转写字幕        scripts/transcribe_srt.py 视频.mp4
@@ -22,7 +23,7 @@ description: 把直播回放/课程录像/会议长视频自动拆解成按讲�
   7. 交付            cut/ 视频+字幕，docs/ 文稿，ppt/ PPT
 ```
 
-环境配置见 references/asr-setup.md（ffmpeg + mlx-whisper / faster-whisper，国内设 `HF_ENDPOINT=https://hf-mirror.com`）。
+环境配置见 references/asr-setup.md（先跑 scripts/detect_env.py 自动选型，机型决策表见 references/model-selection.md）（ffmpeg + mlx-whisper / faster-whisper，国内设 `HF_ENDPOINT=https://hf-mirror.com`）。
 各平台下载细节见 references/download-sources.md。
 **开工前先读 references/pitfalls.md**——里面每条都是真实事故换来的。
 

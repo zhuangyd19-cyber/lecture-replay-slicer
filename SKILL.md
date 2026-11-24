@@ -1,6 +1,6 @@
 ---
 name: lecture-replay-slicer
-description: 把直播回放/课程录像/会议长视频自动拆解成按讲者或议程划分的片段并配上对齐的中文字幕。输入可以是视频链接（小鹅通等 H5 回放、B站、YouTube）或本地视频文件，可选输入日程表（图片/PDF）自动推导切片边界。流程：下载或读取视频 → 30 秒小窗 ASR 转写（防时间轴漂移，中文全角标点，自动过滤幻觉垃圾）→ 对齐校验与定点修复 → 按边界表无损切片 → 生成内嵌字幕版视频+同名外挂 srt。当用户说"把这个直播录下来/下载下来""按日程/每个老师切成片段""给视频配字幕""字幕和声音对不上""把回放拆解成每段讲座"，或给出视频链接/录像文件+会议日程时使用。
+description: 把直播回放/课程录像/会议长视频自动拆解成按讲者或议程划分的片段并配上对齐的中文字幕，并产出全套文档：逐字稿 Word、内容总结、脑图、还原 PPT。输入可以是视频链接（小鹅通等 H5 回放、B站、YouTube）或本地视频文件，可选输入日程表（图片/PDF）自动推导切片边界。流程：下载或读取视频 → 30 秒小窗 ASR 转写（防时间轴漂移，中文全角标点，自动过滤幻觉垃圾）→ 对齐校验与定点修复 → 按边界表无损切片 → 内嵌字幕版视频+同名外挂 srt → 逐字稿/总结/脑图/PPT。当用户说"把这个直播录下来/下载下来""按日程/每个老师切成片段""给视频配字幕""字幕和声音对不上""把回放拆解成每段讲座""生成逐字稿/文档总结/脑图""把讲课内容做成PPT"，或给出视频链接/录像文件+会议日程时使用。
 ---
 
 # 直播回放自动切片配字幕
@@ -17,7 +17,9 @@ description: 把直播回放/课程录像/会议长视频自动拆解成按讲�
   4. 对齐校验        scripts/align_check.py 视频.mp4
      └─ 异常区间 → scripts/transcribe_srt.py 视频.mp4 --replace-range S E → 回到 4
   5. 切片封装        scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
-  6. 交付            cut/ 下每段 mp4（内嵌字幕轨）+ 同名 srt（外挂）
+  6. 文档交付物      scripts/make_seg_docs.py 字幕.srt 边界表.csv
+                     → 逐字稿 Word / 总结 / 脑图 / PPT（references/deliverables.md）
+  7. 交付            cut/ 视频+字幕，docs/ 文稿，ppt/ PPT
 ```
 
 环境配置见 references/asr-setup.md（ffmpeg + mlx-whisper / faster-whisper，国内设 `HF_ENDPOINT=https://hf-mirror.com`）。
@@ -69,9 +71,16 @@ python3 scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
 
 流复制无损秒切；每段产出内嵌 mov_text 字幕轨的 mp4 + 时间平移后的同名 srt。
 
-### 6. 可选交付物
+### 6. 文档交付物（逐字稿 / 总结 / 脑图 / PPT）
 
-- 逐字稿 Word：按边界表把 srt 文本切段，LLM 顺句读补标点后转 docx。
+```bash
+python3 scripts/make_seg_docs.py 字幕.srt 边界表.csv   # 每段逐字稿 txt
+```
+
+然后按 references/deliverables.md 生成：逐字稿 Word（pandoc，含 3-5 句总结）、Mermaid 脑图、还原 PPT（场景抽帧 + kimi-slides 管线，没有该技能时退化为截图集）。先出 1 份样张给用户确认再批量。
+
+### 7. 可选加工
+
 - 压缩分享版：`ffmpeg -c:v hevc_videotoolbox -b:v 2200k -s 1920x1080`（macOS 硬件编码），先出样片给用户确认。
 - 播放器建议：IINA（自动加载内嵌轨和同名 srt）。
 
@@ -81,3 +90,4 @@ python3 scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
 - [ ] align_check 无未解释的 ⚠️
 - [ ] 每个成品视频恰好 1 条字幕轨（`ffprobe -select_streams s`）
 - [ ] 外挂 srt 与视频同名同目录
+- [ ] 每段逐字稿/总结/脑图/PPT 与切片一一对应，无缺漏

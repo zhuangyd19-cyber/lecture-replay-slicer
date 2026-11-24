@@ -1,6 +1,6 @@
 # Lecture Replay Slicer（录像切片师）
 
-**Part of the "Zhuangsheng Jieniu" (庄生解牛) series · by Zhuang Yuandong**
+**Part of the "Zhuangsheng Jieniu" (庄生解牛) series · by Dongsheng (Zhuang Yuandong)**
 
 ![Poster](assets/poster.png)
 

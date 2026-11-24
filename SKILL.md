@@ -17,7 +17,7 @@ description: 把直播回放/课程录像/会议长视频自动拆解成按讲�
   4. 对齐校验        scripts/align_check.py 视频.mp4
      └─ 异常区间 → scripts/transcribe_srt.py 视频.mp4 --replace-range S E → 回到 4
   5. 切片封装        scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
-  6. 文档交付物      scripts/make_seg_docs.py 字幕.srt 边界表.csv
+  6. 文档交付物      scripts/make_seg_docs.py 视频.srt 边界表.csv（整场时间轴的 srt）
                      → 逐字稿 Word / 总结 / 脑图 / PPT（references/deliverables.md）
   7. 交付            cut/ 视频+字幕，docs/ 文稿，ppt/ PPT
 ```
@@ -74,8 +74,10 @@ python3 scripts/slice_video.py 视频.mp4 边界表.csv --outdir cut
 ### 6. 文档交付物（逐字稿 / 总结 / 脑图 / PPT）
 
 ```bash
-python3 scripts/make_seg_docs.py 字幕.srt 边界表.csv   # 每段逐字稿 txt
+python3 scripts/make_seg_docs.py 视频.srt 边界表.csv   # 每段逐字稿 txt
 ```
+
+注意：这里的 srt 必须用第 3 步生成、第 4 步校验过的**整场字幕**（整场时间轴），不能用切片后从 0 起算的片段 srt，否则区间会对不上。
 
 然后按 references/deliverables.md 生成：逐字稿 Word（pandoc，含 3-5 句总结）、Mermaid 脑图、还原 PPT（场景抽帧 + kimi-slides 管线，没有该技能时退化为截图集）。先出 1 份样张给用户确认再批量。
 

@@ -18,8 +18,12 @@ mermaid 代码放进 .md 代码块交付；有 mermaid-cli（`npm i -g @mermaid-
 
 把视频里讲者翻页的幻灯片还原成可编辑 PPT：
 
-1. **抽帧**：`ffmpeg -i 片段.mp4 -vf "select='gt(scene,0.35)',showinfo" -vsync vfr frames/%04d.png`
+1. **抽帧**：先建目录再抽，保留首帧防止漏掉第一页：
+   ```bash
+   mkdir -p frames/<name> && ffmpeg -i 片段.mp4 -vf "select='eq(n,0)+gt(scene,0.35)',showinfo" -vsync vfr frames/<name>/%04d.png
+   ```
    按场景切换抽帧，翻页瞬间会出一帧；同页停留久会重复，按视觉去重（PPT 内容不变的帧只留一张）。
+   对变化小的翻页（同一模板只改几行字，场景分低于阈值），再用定时抽帧补查：`-vf fps=1/30` 抽样比对。
 2. **还原**：有 kimi-slides 技能时走其 PPTD 管线（每页：截图作底或重排文字版式，备注写该页的逐字稿原文），逐页构建、校验、交付。
    没有该技能时退化为「截图集 + 逐字稿备注」的朴素 PPT 或直接交付图片集。
 3. 页数失控时（>80 页）先问用户是否只要关键页。

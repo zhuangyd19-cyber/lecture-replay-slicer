@@ -48,7 +48,14 @@ ppt/        从视频画面还原的可编辑 PPT
 
 ## 安装
 
-把本目录放入你的 Agent 技能目录（如 Kimi 的 `skills/` 目录），或直接安装 `.skill` 分发包。
+把本目录放入任一平台的技能目录即可，同一份 SKILL.md 全平台通用：
+
+| 平台 | 技能目录 |
+|---|---|
+| Kimi Work | `~/Library/Application Support/kimi-desktop/daimon-share/daimon/skills/`（或安装 `.skill` 分发包） |
+| Claude Code | `~/.claude/skills/` |
+| Codex | `~/.codex/skills/` |
+| WorkBuddy | `~/.workbuddy/skills/` |
 
 运行依赖：`ffmpeg`、Python 3.10+、ASR 后端二选一（Apple Silicon 装 `mlx-whisper`，其它平台装 `faster-whisper`；国内设 `HF_ENDPOINT=https://hf-mirror.com` 加速模型下载）。详见 `references/asr-setup.md`。
 

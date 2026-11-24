@@ -8,6 +8,8 @@
 
 一个给 AI Agent（Kimi 等）使用的技能包（Skill）。你只需要给它**一个视频（链接或本地文件）+ 一张会议日程表**，剩下的全部自动完成。
 
+> 🗺️ 发展路线图见 [ROADMAP.md](ROADMAP.md)：说话人分离 → FireRedASR/Qwen3-ASR → 可证明的 SOTA。
+
 ## 效果
 
 输入：

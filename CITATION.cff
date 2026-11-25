@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Lecture Replay Slicer (录像切片师) — a Zhuangsheng Jieniu series skill"
+authors:
+  - family-names: ZHUANG
+    given-names: Yuandong
+    alias: zhuangyd19-cyber
+version: 1.0.0
+date-released: 2026-11-25
+url: "https://github.com/zhuangyd19-cyber/lecture-replay-slicer"
+license: MIT

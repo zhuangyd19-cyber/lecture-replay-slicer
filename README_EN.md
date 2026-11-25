@@ -1,6 +1,6 @@
 # Lecture Replay Slicer（录像切片师）
 
-**Part of the "Zhuangsheng Jieniu" (庄生解牛) series · by Dongsheng (Zhuang Yuandong)**
+**Part of the "Zhuangsheng Jieniu" (庄生解牛) series · by Yuandong ZHUANG (庄源东, pen name 东生 / Dongsheng)**
 
 ![Poster](assets/poster.png)
 
@@ -77,7 +77,7 @@ Download `lecture-replay-slicer.skill` from [Releases](https://github.com/zhuang
 The design blueprint behind this project:
 
 - **Naming**: Zhuangsheng Jieniu (series) — by Dongsheng → Lecture Replay Slicer (the function)
-- **Triple metaphor in the name**: *Zhuangsheng* = the author Zhuang Yuandong, "a student"; *Zhuangzi's butterfly dream* → the pain of replays: lost, confused, too slow; *Jieniu* = Pao Ding carving the ox in the *Zhuangzi*, "a blade with no thickness enters the gaps" — dissecting the ideas of masters for you
+- **Triple metaphor in the name**: *Zhuangsheng* = the author Yuandong ZHUANG (庄源东), "a student"; *Zhuangzi's butterfly dream* → the pain of replays: lost, confused, too slow; *Jieniu* = Pao Ding carving the ox in the *Zhuangzi*, "a blade with no thickness enters the gaps" — dissecting the ideas of masters for you
 - **The Seven Moves**: Download → Transcribe → Punctuate → Align → Slice → Compose → Courseware
 - **A full set of course assets**: sliced videos · synced subtitles · transcripts · lecture slides
 - **Input**: video / download link / live link / replay link + schedule / key points

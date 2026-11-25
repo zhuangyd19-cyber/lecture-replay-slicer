@@ -70,6 +70,20 @@ Download `lecture-replay-slicer.skill` from [Releases](https://github.com/zhuang
 - **By intent**: "Download this replay", "Slice it by the schedule, one clip per speaker", "Add subtitles", "The subtitles don't match the audio", "Make a transcript / summary / mind map / PPT"
 - **By brand**: say "庄生解牛", "庖丁解牛", or "carve this video like Pao Ding" — same skill, summoned by name
 
+## Design Philosophy (the skeleton)
+
+![Design skeleton: naming, triple metaphor, seven moves, course assets](assets/poster-skeleton-en.jpg)
+
+The design blueprint behind this project:
+
+- **Naming**: Zhuangsheng Jieniu (series) — by Dongsheng → Lecture Replay Slicer (the function)
+- **Triple metaphor in the name**: *Zhuangsheng* = the author Zhuang Yuandong, "a student"; *Zhuangzi's butterfly dream* → the pain of replays: lost, confused, too slow; *Jieniu* = Pao Ding carving the ox in the *Zhuangzi*, "a blade with no thickness enters the gaps" — dissecting the ideas of masters for you
+- **The Seven Moves**: Download → Transcribe → Punctuate → Align → Slice → Compose → Courseware
+- **A full set of course assets**: sliced videos · synced subtitles · transcripts · lecture slides
+- **Input**: video / download link / live link / replay link + schedule / key points
+- **Cost**: unattended, time-saving; local models — no tokens, zero cost
+- **Strengths**: faster in both understanding and processing; stronger — it is a framework, better models make it stronger; freer — works with any player and subtitle workflow
+
 ## Compliance
 
 Download and process **only content you are authorized to use** (your own institution's replays, licensed courses, openly shared talks). Respect copyright and platform terms.
